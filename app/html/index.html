@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>摩登音乐台 FM975</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link href="../css/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
+    <!-- <style>
+      body {
+        overflow: hidden;
+      }
+    </style> -->
+  </head>
+  <body>
+    <div class="container">
+      <div class="row mt-4">
+        <div class="col-12">
+            <img src="../resources/img/pic.jpg" class="img-fluid">
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-4 text-center"></div>
+        <div class="col-4 text-center">
+          <span class="oi oi-media-play" id="playButton" aria-hidden="true" style="font-size: 3em"></span>
+        </div>
+        <div class="col-4 text-center"></div>
+      </div>
+    </div>
+    
+    <script src="../js/hls.js"></script>
+    <audio id="audio"></audio>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="../js/jquery-3.3.1.min.js"></script>
+    <script src="../js/popper.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <script>
+        var audio = document.getElementById('audio');
+        var currentStatus = 'pause';
+        var hls = null;
+        var playOrPause = function () {
+          if (currentStatus == 'pause') {
+            hls = new Hls();
+            hls.loadSource('http://live.xmcdn.com/live/73/64.m3u8');
+            hls.attachMedia(audio);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+              audio.play();
+            });
+            $("#playButton").removeClass("oi-media-play").addClass("oi-media-stop")
+            currentStatus = 'play'
+          } else if (currentStatus == 'play') {
+            audio.pause()
+            hls.destroy()
+            $("#playButton").removeClass("oi-media-stop").addClass("oi-media-play")
+            currentStatus = 'pause'
+          }
+        }
+
+        $("#playButton").click(playOrPause)
+        
+      </script>
+  </body>
+</html>

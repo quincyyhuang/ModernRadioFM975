@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>听歌识曲</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link href="../css/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
+    <!-- <style>
+      body {
+        overflow: hidden;
+      }
+    </style> -->
+  </head>
+  <body>
+    <div class="container">
+			<div class="row">
+				<div class="col-12">
+					<img src="../resources/img/loading_spinner.gif" class="img-fluid">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 text-center">
+					<p><b>听歌识曲中···</b></p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 text-center">
+						<button type="button" id="stop" class="btn btn-dark"><b>停止</b></button>
+				</div>
+			</div>
+    </div>
+    
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="../js/jquery-3.3.1.min.js"></script>
+    <script src="../js/popper.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+		<script>if (window.module) module = window.module;</script>
+    <script>
+        const {desktopCapturer} = require('electron')
+				const fs = require('fs')
+				var ACRCloud = require('../module/ACRCloud')
+				var chunks = [];
+
+        var soundhound = function() {
+						console.log('start capture, default capture time is 14s')
+            desktopCapturer.getSources({types: ['screen']}, (error, sources) => {
+						if (error) throw error
+						for (var i = 0; i < sources.length; i++) {
+							if (sources[i].name == 'Entire screen') {
+								// Start to capture audio
+								navigator.mediaDevices.getUserMedia({
+									audio: {
+										mandatory: {
+											chromeMediaSource: 'desktop'
+										}
+									},
+									video: {
+										mandatory: {
+											chromeMediaSource: 'desktop',
+											minWidth: 128,
+											maxWidth: 128,
+											minHeight: 72,
+											maxHeight: 72
+										}
+									}
+								})
+								.then((stream) => {
+									var mediaRecorder = new MediaRecorder(stream, {mimeType : 'video/webm'});
+									mediaRecorder.start();
+									var timeout = setTimeout(() => {
+										mediaRecorder.stop();
+										console.log('stop capture')
+									}, 14000)
+
+									mediaRecorder.onstop = function(e) {
+										var blob = new Blob(chunks, { 'type' : 'video/webm' });
+										var reader = new FileReader();
+										reader.readAsArrayBuffer(blob);
+										reader.addEventListener("loadend", function() {
+											var result = reader.result
+											var buffer = Buffer.from(result)
+											ACRCloud.identify(buffer, (error, response, body) => {
+												if (error) throw error;
+												var info = JSON.parse(body)
+												var name = []
+												for (var i = 0; i < info.metadata.music[0].artists.length; i++) name.push(info.metadata.music[0].artists[i].name)
+												name = name.join(' & ')
+												info.metadata.music[0].artists = name
+												// Display the information
+												if (info.status.code != 0) {
+													var errorString
+													switch (info.status.code) {
+														case 1001:
+															errorString = '无匹配结果'
+															break
+														case 2000:
+															errorString = '录音错误'
+															break
+														case 3000:
+															errorString = '听歌识曲服务器内部错误'
+															break
+														case 2005:
+															errorString = '超时'
+															break
+														case 2004:
+															errorString = '无法生成指纹'
+															break
+														case 2002:
+															errorString = '元信息解析错误'
+															break
+														default:
+															errorString = '未知错误'
+															break
+													}
+													$('.container').html('<div class="row"><div class="col-12 text-center"><p><b>' + errorString + '</b></p></div></div>')
+												} else {
+													var html = `
+													<div class="row text-center mt-1">
+														<div class="col-4"><p style="font-size: 0.8em;">歌名</p></div>
+														<div class="col-8"><p><b>${info.metadata.music[0].title}</b></p></div>
+													</div>
+													<div class="row text-center">
+														<div class="col-4"><p style="font-size: 0.8em;">歌手</p></div>
+														<div class="col-8"><p><b>${info.metadata.music[0].artists}</b></p></div>
+													</div>
+													<div class="row text-center">
+														<div class="col-4"><p style="font-size: 0.8em;">专辑</p></div>
+														<div class="col-8"><p><b>${info.metadata.music[0].album.name}</b></p></div>
+													</div>
+													<div class="row text-center">
+														<div class="col-4"><p style="font-size: 0.8em;">发行日期</p></div>
+														<div class="col-8"><p><b>${info.metadata.music[0].release_date}</b></p></div>
+													</div>
+													`
+													$('.container').html(html)
+												}
+												chunks = [];
+											})
+										});
+									}
+
+									mediaRecorder.ondataavailable = function(e) {
+										chunks.push(e.data);
+									}
+
+									$('#stop').click( function () {
+										clearTimeout(timeout)
+										mediaRecorder.stop()
+										console.log('stop capture')
+									})
+								})
+								.catch((e) => {
+									console.log(e)
+								})
+								return
+							}
+						}
+					})
+				}
+				
+				soundhound()
+
+			</script>
+			<script>
+				
+			</script>
+  </body>
+</html>

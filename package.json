@@ -17,6 +17,7 @@
   "author": "Quincy Huang",
   "license": "CC-BY-4.0",
   "dependencies": {
-    "electron": "^1.8.2"
+    "electron": "^1.8.2",
+    "request": "^2.83.0"
   }
 }
