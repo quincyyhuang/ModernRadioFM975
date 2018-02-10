@@ -1,0 +1,22 @@
+{
+  "name": "modernradiofm975",
+  "version": "1.0.0",
+  "description": "A client for Modern Radio FM975",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@g.aka.moe:quincyhuang/ModernRadioFM975.git"
+  },
+  "keywords": [
+    "Modern",
+    "Radio"
+  ],
+  "author": "Quincy Huang",
+  "license": "CC-BY-4.0",
+  "dependencies": {
+    "electron": "^1.8.2"
+  }
+}
