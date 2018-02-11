@@ -4,23 +4,18 @@
   "description": "A client for Modern Radio FM975",
   "main": "main.js",
   "scripts": {
-    "start": "electron ./src/main.js"
+    "start": "electron ."
   },
   "repository": {
     "type": "git",
     "url": "git@g.aka.moe:quincyhuang/ModernRadioFM975.git"
   },
   "keywords": [
-    "Modern",
-    "Radio"
+    "ModernMusicRadio"
   ],
   "author": "Quincy Huang",
   "license": "MIT",
   "dependencies": {
-    "electron": "^1.8.2",
     "request": "^2.83.0"
-  },
-  "devDependencies": {
-    "electron-packager": "^11.0.0"
   }
 }

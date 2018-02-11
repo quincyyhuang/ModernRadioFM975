@@ -73,7 +73,8 @@
 									mediaRecorder.start();
 									var timeout = setTimeout(() => {
 										mediaRecorder.stop();
-										console.log('stop capture')
+										$('#stop').unbind('click');
+										console.log('stop capture');
 									}, 10000)
 
 									mediaRecorder.onstop = function(e) {
