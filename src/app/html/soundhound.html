@@ -46,7 +46,7 @@
 				var chunks = [];
 
         var soundhound = function() {
-						console.log('start capture, default capture time is 14s')
+						console.log('start capture, default capture time is 10s')
             desktopCapturer.getSources({types: ['screen']}, (error, sources) => {
 						if (error) throw error
 						for (var i = 0; i < sources.length; i++) {
@@ -74,7 +74,7 @@
 									var timeout = setTimeout(() => {
 										mediaRecorder.stop();
 										console.log('stop capture')
-									}, 14000)
+									}, 10000)
 
 									mediaRecorder.onstop = function(e) {
 										var blob = new Blob(chunks, { 'type' : 'video/webm' });
@@ -86,10 +86,6 @@
 											ACRCloud.identify(buffer, (error, response, body) => {
 												if (error) throw error;
 												var info = JSON.parse(body)
-												var name = []
-												for (var i = 0; i < info.metadata.music[0].artists.length; i++) name.push(info.metadata.music[0].artists[i].name)
-												name = name.join(' & ')
-												info.metadata.music[0].artists = name
 												// Display the information
 												if (info.status.code != 0) {
 													var errorString
@@ -118,6 +114,10 @@
 													}
 													$('.container').html('<div class="row"><div class="col-12 text-center"><p><b>' + errorString + '</b></p></div></div>')
 												} else {
+													var name = []
+													for (var i = 0; i < info.metadata.music[0].artists.length; i++) name.push(info.metadata.music[0].artists[i].name)
+													name = name.join(' & ')
+													info.metadata.music[0].artists = name
 													var html = `
 													<div class="row text-center mt-1">
 														<div class="col-4"><p style="font-size: 0.8em;">歌名</p></div>

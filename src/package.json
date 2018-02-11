@@ -4,9 +4,6 @@
   "description": "A client for Modern Radio FM975",
   "main": "main.js",
   "scripts": {
-    "build": "electron-packager ./src ModernMusicRadioFM975 --out=./build --icon=./src/app/resources/img/icon.png --app-copyright=\"Quincy Huang 2018\" --app-version=1.0.0",
-    "build-installer": "node ./scripts/build-installer.js",
-    "clean": "rm -fr ./build/*",
     "start": "electron ./src/main.js"
   },
   "repository": {

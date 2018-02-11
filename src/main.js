@@ -67,13 +67,13 @@ function createMenu() {
 	var Clicked = function (menuItem, browserWindow, event) {
 		switch (menuItem.label) {
 			case '反馈':
-				shell.openExternal('https://g.aka.moe/quincyhuang/ModernRadioFM975')
+				shell.openExternal('https://github.com/quincyyhuang/ModernRadioFM975/issues')
 				break
 			case '更多':
-				shell.openExternal('https://g.aka.moe/quincyhuang/ModernRadioFM975')
+				shell.openExternal('https://github.com/quincyyhuang/ModernRadioFM975')
 				break
 			case '更新':
-				shell.openExternal('https://g.aka.moe/quincyhuang/ModernRadioFM975')
+				shell.openExternal('https://github.com/quincyyhuang/ModernRadioFM975/releases')
 				break
 			default:
 				break
@@ -90,7 +90,8 @@ function createMenu() {
 				{ label: 'Quincy Huang', enabled: false },
 				{ label: 'Version 1.0.0', enabled: false },
 				{ label: '反馈', click: Clicked },
-				{ label: '更多', click: Clicked }
+				{ label: '更多', click: Clicked },
+				{ label: '更新', click: Clicked }
 			]
 		}
 	]
@@ -114,7 +115,7 @@ function createTray() {
 
 app.on('ready', () => {
 	globalShortcut.register('CommandOrControl+I', () => {
-		BrowserWindow.getFocusedWindow().webContents.openDevTools()
+		BrowserWindow.getFocusedWindow().webContents.openDevTools({ mode: 'detach' })
 	})
 	createMenu()
 	createWindow()
