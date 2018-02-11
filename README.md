@@ -6,9 +6,20 @@ A client for Modern Radio FM975 on Win/Mac/Linux.
 
 # Installation 安装
 
-Please download binaries in [release](https://github.com/quincyyhuang/ModernRadioFM975/releases) page.
+Please download binaries or portable zips in [release](https://github.com/quincyyhuang/ModernRadioFM975/releases) page.
 
-请在 [发布](https://github.com/quincyyhuang/ModernRadioFM975/releases) 页面下载可执行程序。
+请在 [发布](https://github.com/quincyyhuang/ModernRadioFM975/releases) 页面下载安装包或压缩包版本。
+
+# Debug 调试
+
+`git clone https://github.com/quincyyhuang/ModernRadioFM975.git`
+
+`npm install` or `yarn [install]`
+
+`npm start` or `yarn start`
+
+**Use shortcut *Ctrl + I* or *Command + I* to open Chrome dev tools for focused window.**
+**使用键盘快捷键 *Ctrl + I* or *Command + I* 来打开当前窗口的 Chrome 调试工具。**
 
 # Functions 功能
 
