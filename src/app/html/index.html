@@ -40,6 +40,10 @@
     <script src="../js/bootstrap.min.js"></script>
     <script>if (window.module) module = window.module;</script>
     <script>
+      var i18n = new(require('../module/i18n'))
+      $('title').text(i18n.__('IndexTitle'))
+    </script>
+    <script>
         var audio = document.getElementById('audio');
         var currentStatus = 'pause';
         var hls = null;
