@@ -1,6 +1,6 @@
 {
   "name": "modernradiofm975",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A client for Modern Radio FM975",
   "main": "main.js",
   "scripts": {
@@ -19,6 +19,7 @@
   "author": "Quincy Huang",
   "license": "MIT",
   "dependencies": {
+    "regedit": "^2.2.7",
     "request": "^2.83.0"
   },
   "devDependencies": {

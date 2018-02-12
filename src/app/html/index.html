@@ -40,7 +40,13 @@
     <script src="../js/bootstrap.min.js"></script>
     <script>if (window.module) module = window.module;</script>
     <script>
+      var i18n = new(require('../module/i18n'))
+      $('title').text(i18n.__('IndexTitle'))
+    </script>
+    <script>
         var audio = document.getElementById('audio');
+        const electron = require('electron');
+        let app = electron.remote.app
         var currentStatus = 'pause';
         var hls = null;
         var playOrPause = function () {
@@ -62,6 +68,7 @@
         }
 
         $("#playButton").click(playOrPause)
+        if (app.config.autoplay) $("#playButton").click()
         
       </script>
   </body>

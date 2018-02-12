@@ -1,8 +1,11 @@
-const {app, Menu, Tray, shell, globalShortcut, desktopCapturer, BrowserWindow} = require('electron')
+const {app, dialog, Menu, Tray, shell, globalShortcut, desktopCapturer, BrowserWindow} = require('electron')
+const { execFile } = require('child_process')
 const path = require('path')
 const url = require('url')
 const fs = require('fs')
+var regedit = require('regedit')
 
+// Keep reference of windows
 let win
 let soundhound
 let tray
@@ -31,6 +34,15 @@ function captureAudio() {
 
 	soundhound.on('closed', () => {
 		soundhound = null
+	})
+}
+
+function test() {
+	const regLocation = 'HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\QQMusic'
+	// execFile('G:\\Tencent\\QQMusic\\QQMusic.exe', ['-songrecognition'])
+	regedit.list(regLocation, function(err, result) {
+		var exe = path.join(result[regLocation].values['InstallLocation'].value, 'QQMusic.exe')
+		execFile(exe, ['-songrecognition'])
 	})
 }
 
@@ -64,52 +76,117 @@ function createWindow () {
 }
 
 function createMenu() {
-	var Clicked = function (menuItem, browserWindow, event) {
+	var i18n = new(require('./app/module/i18n'))
+	var currentLocale = app.config.language
+	var autoplayStatus = app.config.autoplay
+	var Clicked = function(menuItem, browserWindow, event) {
 		switch (menuItem.label) {
-			case '反馈':
+			case i18n.__('Feedback'):
 				shell.openExternal('https://github.com/quincyyhuang/ModernRadioFM975/issues')
 				break
-			case '更多':
+			case i18n.__('More'):
 				shell.openExternal('https://github.com/quincyyhuang/ModernRadioFM975')
 				break
-			case '更新':
+			case i18n.__('Update'):
 				shell.openExternal('https://github.com/quincyyhuang/ModernRadioFM975/releases')
 				break
+			case i18n.__('Donate'):
+				shell.openExternal('https://github.com/quincyyhuang/ModernRadioFM975#donations-%E6%8D%90%E5%8A%A9')
 			default:
 				break
 		}
 	}
+
+	var languageClicked = function(menuItem, browserWindow, event) {
+		switch (menuItem.label) {
+			case 'English':
+				app.config.language = 'en-US'
+				break
+			case '中文（简体）':
+				app.config.language = 'zh-CN'
+				break
+			case '中文（繁體）':
+				app.config.language = 'zh-TW'
+				break
+			case '日本語':
+				app.config.language = 'ja'
+				break
+		}
+		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(app.config))
+		dialog.showMessageBox({
+			type: 'info',
+			title: i18n.__('ConfigSavedNeedRestartTitle'),
+			message: i18n.__('ConfigSavedNeedRestart')
+		})
+	}
+
+	var autoplayClicked = function(menuItem, browserWindow, event) {
+		app.config.autoplay = menuItem.checked
+		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(app.config))
+		dialog.showMessageBox({
+			type: 'info',
+			title: i18n.__('ConfigSavedNeedRestartTitle'),
+			message: i18n.__('ConfigSavedNeedRestart')
+		})
+	}
+
 	const template = [
 		{
-			label: '听歌识曲',
+			label: i18n.__('Song Recognition'),
 			click: captureAudio
 		},
 		{
-			label: '关于',
+			label: i18n.__('About'),
 			submenu: [
 				{ label: 'Quincy Huang', enabled: false },
 				{ label: 'Version 1.0.0', enabled: false },
-				{ label: '反馈', click: Clicked },
-				{ label: '更多', click: Clicked },
-				{ label: '更新', click: Clicked }
+				{ label: i18n.__('Feedback'), click: Clicked },
+				{ label: i18n.__('More'), click: Clicked },
+				{ label: i18n.__('Update'), click: Clicked },
+				{ label: i18n.__('Donate'), click: Clicked }
+			]
+		},
+		{
+			label: i18n.__('Settings'),
+			submenu: [
+				{
+					label: i18n.__('Language'),
+					submenu: [
+						{ label: 'English', type: 'radio', checked: currentLocale == 'en-US' ? true : false, click: languageClicked },
+						{ label: '中文（简体）', type: 'radio', checked: currentLocale == 'zh-CN' ? true : false, click: languageClicked },
+						{ label: '中文（繁體）', type: 'radio', checked: currentLocale == 'zh-TW' ? true : false, click: languageClicked },
+						{ label: '日本語', type: 'radio', checked: currentLocale == 'ja' ? true : false, click: languageClicked }
+					]
+				},
+				{
+					label: i18n.__('Autoplay'),
+					type: 'checkbox',
+					checked: autoplayStatus,
+					click: autoplayClicked
+				}
 			]
 		}
+		// {
+		// 	label: 'TEST',
+		// 	click: test
+		// }
 	]
 	const menu = Menu.buildFromTemplate(template)
 	Menu.setApplicationMenu(menu)
 }
 
 function createTray() {
+	var i18n = new(require('./app/module/i18n'))
 	tray = new Tray(path.join(__dirname, 'app', 'resources', 'img', 'logo.png'))
 	const contextMenu = Menu.buildFromTemplate([
-		{ label: '显示', click() { win.show() } },
-		{ label: '退出', role: 'quit' }
+		{ label: i18n.__('Show'), click() { win.show() } },
+		{ label: i18n.__('Exit'), role: 'quit' }
 	])
 	tray.on('click', (event) => {
 		event.preventDefault()
 		win.show()
 	})
-	tray.setToolTip('摩登音乐台 FM975')
+	tray.setToolTip(i18n.__('ToolTipText'))
 	tray.setContextMenu(contextMenu)
 }
 
@@ -117,9 +194,17 @@ app.on('ready', () => {
 	globalShortcut.register('CommandOrControl+I', () => {
 		BrowserWindow.getFocusedWindow().webContents.openDevTools({ mode: 'detach' })
 	})
+	try {
+		var config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'))
+		app.config = config
+	} catch(e) {
+		dialog.showErrorBox('Error', 'Your config file is damaged. You may re-install to fix this issue.')
+		app.quit()
+	}
 	createMenu()
 	createWindow()
 	createTray()
+	
 })
 
 app.on('window-all-closed', () => {

@@ -25,6 +25,7 @@ Please download binaries or portable zips in [release](https://github.com/quincy
 
 1. An easy and fresh tool to listen to Modern Music Radio FM975. 简单方便的收听摩登音乐台。
 2. Soundhound whatever music that is on the radio in 1 click. 随时一键听歌识曲。
+3. Simplified Chinese, Traditional Chinese, English and Japanese are available. 简体中文，繁体中文，英语和日本语支持。
 
 # Open Source App License 开源软件许可
 

@@ -22,7 +22,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-12 text-center">
+				<div class="col-12 text-center" id="inProgress">
 					<p><b>听歌识曲中···</b></p>
 				</div>
 			</div>
@@ -39,6 +39,12 @@
     <script src="../js/popper.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
 		<script>if (window.module) module = window.module;</script>
+		<script>
+			var i18n = new(require('../module/i18n'))
+			$('title').text(i18n.__('SoundhoundTitle'))
+			$('#inProgress').html(`<p><b>${i18n.__('SoundhoundInProgress')}</b></p>`)
+			$('#stop').html(`<b>${i18n.__('SoundhoundStopButton')}</b>`)
+		</script>
     <script>
         const {desktopCapturer} = require('electron')
 				const fs = require('fs')
@@ -92,25 +98,25 @@
 													var errorString
 													switch (info.status.code) {
 														case 1001:
-															errorString = '无匹配结果'
+															errorString = i18n.__('SoundhoundStatus1001')
 															break
 														case 2000:
-															errorString = '录音错误'
+															errorString = i18n.__('SoundhoundStatus2000')
 															break
 														case 3000:
-															errorString = '听歌识曲服务器内部错误'
+															errorString = i18n.__('SoundhoundStatus3000')
 															break
 														case 2005:
-															errorString = '超时'
+															errorString = i18n.__('SoundhoundStatus2005')
 															break
 														case 2004:
-															errorString = '无法生成指纹'
+															errorString = i18n.__('SoundhoundStatus2004')
 															break
 														case 2002:
-															errorString = '元信息解析错误'
+															errorString = i18n.__('SoundhoundStatus2002')
 															break
 														default:
-															errorString = '未知错误'
+															errorString = i18n.__('SoundhoundStatusUnknown')
 															break
 													}
 													$('.container').html('<div class="row"><div class="col-12 text-center"><p><b>' + errorString + '</b></p></div></div>')
@@ -121,19 +127,19 @@
 													info.metadata.music[0].artists = name
 													var html = `
 													<div class="row text-center mt-1">
-														<div class="col-4"><p style="font-size: 0.8em;">歌名</p></div>
+														<div class="col-4"><p style="font-size: 0.8em;">${i18n.__('SoundhoundDivTitle')}</p></div>
 														<div class="col-8"><p><b>${info.metadata.music[0].title}</b></p></div>
 													</div>
 													<div class="row text-center">
-														<div class="col-4"><p style="font-size: 0.8em;">歌手</p></div>
+														<div class="col-4"><p style="font-size: 0.8em;">${i18n.__('SoundhoundDivArtists')}</p></div>
 														<div class="col-8"><p><b>${info.metadata.music[0].artists}</b></p></div>
 													</div>
 													<div class="row text-center">
-														<div class="col-4"><p style="font-size: 0.8em;">专辑</p></div>
+														<div class="col-4"><p style="font-size: 0.8em;">${i18n.__('SoundhoundDivAlbum')}</p></div>
 														<div class="col-8"><p><b>${info.metadata.music[0].album.name}</b></p></div>
 													</div>
 													<div class="row text-center">
-														<div class="col-4"><p style="font-size: 0.8em;">发行日期</p></div>
+														<div class="col-4"><p style="font-size: 0.8em;">${i18n.__('SoundhoundDivReleaseDate')}</p></div>
 														<div class="col-8"><p><b>${info.metadata.music[0].release_date}</b></p></div>
 													</div>
 													`
