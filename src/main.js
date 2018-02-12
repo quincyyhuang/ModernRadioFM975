@@ -4,7 +4,6 @@ const path = require('path')
 const url = require('url')
 const fs = require('fs')
 var regedit = require('regedit')
-var i18n = new(require('./app/module/i18n'))
 
 // Keep reference of windows
 let win
@@ -76,9 +75,10 @@ function createWindow () {
 	})
 }
 
-function createMenu(config) {
-	var currentLocale = config.language
-	var autoplayStatus = config.autoplay
+function createMenu() {
+	var i18n = new(require('./app/module/i18n'))
+	var currentLocale = app.config.language
+	var autoplayStatus = app.config.autoplay
 	var Clicked = function(menuItem, browserWindow, event) {
 		switch (menuItem.label) {
 			case i18n.__('Feedback'):
@@ -100,19 +100,19 @@ function createMenu(config) {
 	var languageClicked = function(menuItem, browserWindow, event) {
 		switch (menuItem.label) {
 			case 'English':
-				config.language = 'en-US'
+				app.config.language = 'en-US'
 				break
 			case '中文（简体）':
-				config.language = 'zh-CN'
+				app.config.language = 'zh-CN'
 				break
 			case '中文（繁體）':
-				config.language = 'zh-TW'
+				app.config.language = 'zh-TW'
 				break
 			case '日本語':
-				config.language = 'ja'
+				app.config.language = 'ja'
 				break
 		}
-		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(config))
+		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(app.config))
 		dialog.showMessageBox({
 			type: 'info',
 			title: i18n.__('ConfigSavedNeedRestartTitle'),
@@ -121,8 +121,8 @@ function createMenu(config) {
 	}
 
 	var autoplayClicked = function(menuItem, browserWindow, event) {
-		config.autoplay = menuItem.checked
-		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(config))
+		app.config.autoplay = menuItem.checked
+		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(app.config))
 		dialog.showMessageBox({
 			type: 'info',
 			title: i18n.__('ConfigSavedNeedRestartTitle'),
@@ -165,17 +165,18 @@ function createMenu(config) {
 					click: autoplayClicked
 				}
 			]
-		},
-		{
-			label: 'TEST',
-			click: test
 		}
+		// {
+		// 	label: 'TEST',
+		// 	click: test
+		// }
 	]
 	const menu = Menu.buildFromTemplate(template)
 	Menu.setApplicationMenu(menu)
 }
 
 function createTray() {
+	var i18n = new(require('./app/module/i18n'))
 	tray = new Tray(path.join(__dirname, 'app', 'resources', 'img', 'logo.png'))
 	const contextMenu = Menu.buildFromTemplate([
 		{ label: i18n.__('Show'), click() { win.show() } },
@@ -195,13 +196,15 @@ app.on('ready', () => {
 	})
 	try {
 		var config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'))
+		app.config = config
 	} catch(e) {
 		dialog.showErrorBox('Error', 'Your config file is damaged. You may re-install to fix this issue.')
 		app.quit()
 	}
-	createMenu(config)
+	createMenu()
 	createWindow()
 	createTray()
+	
 })
 
 app.on('window-all-closed', () => {
