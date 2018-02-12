@@ -4,6 +4,8 @@ const path = require('path')
 const url = require('url')
 const fs = require('fs')
 var regedit = require('regedit')
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
 
 // Keep reference of windows
 let win
@@ -77,8 +79,8 @@ function createWindow () {
 
 function createMenu() {
 	var i18n = new(require('./app/module/i18n'))
-	var currentLocale = app.config.language
-	var autoplayStatus = app.config.autoplay
+	var currentLocale = app.db.get('language').value()
+	var autoplayStatus = app.db.get('autoplay').value()
 	var Clicked = function(menuItem, browserWindow, event) {
 		switch (menuItem.label) {
 			case i18n.__('Feedback'):
@@ -98,21 +100,22 @@ function createMenu() {
 	}
 
 	var languageClicked = function(menuItem, browserWindow, event) {
+		var languageSelected
 		switch (menuItem.label) {
 			case 'English':
-				app.config.language = 'en-US'
+				languageSelected = 'en-US'
 				break
 			case '中文（简体）':
-				app.config.language = 'zh-CN'
+				languageSelected = 'zh-CN'
 				break
 			case '中文（繁體）':
-				app.config.language = 'zh-TW'
+				languageSelected = 'zh-TW'
 				break
 			case '日本語':
-				app.config.language = 'ja'
+				languageSelected = 'ja'
 				break
 		}
-		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(app.config))
+		app.db.set('language', languageSelected).write()
 		dialog.showMessageBox({
 			type: 'info',
 			title: i18n.__('ConfigSavedNeedRestartTitle'),
@@ -121,8 +124,7 @@ function createMenu() {
 	}
 
 	var autoplayClicked = function(menuItem, browserWindow, event) {
-		app.config.autoplay = menuItem.checked
-		fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(app.config))
+		app.db.set('autoplay', menuItem.checked).write()
 		dialog.showMessageBox({
 			type: 'info',
 			title: i18n.__('ConfigSavedNeedRestartTitle'),
@@ -195,8 +197,14 @@ app.on('ready', () => {
 		BrowserWindow.getFocusedWindow().webContents.openDevTools({ mode: 'detach' })
 	})
 	try {
-		var config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'))
-		app.config = config
+		const adapter = new FileSync(path.join(app.getAppPath(), '../', 'config.json'))
+		const db = low(adapter)
+		// Set default config
+		db.defaults({
+			"language": "zh-CN",
+			"autoplay": false
+		}).write()
+		app.db = db
 	} catch(e) {
 		dialog.showErrorBox('Error', 'Your config file is damaged. You may re-install to fix this issue.')
 		app.quit()

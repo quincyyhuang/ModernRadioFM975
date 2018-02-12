@@ -68,7 +68,7 @@
         }
 
         $("#playButton").click(playOrPause)
-        if (app.config.autoplay) $("#playButton").click()
+        if (app.db.get('autoplay').value()) $("#playButton").click()
         
       </script>
   </body>

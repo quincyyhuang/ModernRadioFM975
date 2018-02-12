@@ -9,7 +9,7 @@ module.exports = i18n
 
 function i18n() {
     try {
-        loadedLanguage = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'lang',  app.config.language + '.json'), 'utf8'))
+        loadedLanguage = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'lang',  app.db.get('language').value() + '.json'), 'utf8'))
     } catch(e) {
         loadedLanguage = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'lang', 'zh-CN.json'), 'utf8'))
     }
